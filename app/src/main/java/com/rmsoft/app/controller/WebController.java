@@ -3,6 +3,8 @@ package com.rmsoft.app.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class WebController {
 	
@@ -24,4 +26,18 @@ public class WebController {
 		return "login";
 	}
 	
+	// 로그아웃후 인덱스로 이동
+	@GetMapping("/logout")
+	public String doLogout(HttpSession session) {
+		
+		session.invalidate();
+		
+		return "index";
+	}
+	
+	//구독하기 페이지 이동
+	@GetMapping("/subscribe")
+	public String subscribePage() {
+		return "subscribe";
+	}
 }

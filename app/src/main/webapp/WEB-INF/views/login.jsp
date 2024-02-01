@@ -11,7 +11,7 @@
   <!-- 아이콘 -->
   <script src="https://kit.fontawesome.com/5970d3684d.js"></script>
   
-<title>RMSOFT/로그인</title>
+<title>RMSOFT_로그인</title>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -21,7 +21,6 @@
 		    if($('input').hasClass('active')){
 		    	$(this).attr('class',"fa-solid fa-eye fa-lg").next('input').attr('type',"text");
 		    } else {
-		    	console.log($(this))
 		        $(this).attr('class',"fa-solid fa-eye-slash fa-lg").next('input').attr('type','password');
 		    }
 		 });
@@ -42,7 +41,6 @@
 	       	  dataType: 'json',
 	       	  async : false,
 	       	  success: function(data) {
-	       		  console.log(data);
 	       		  if(data.code == "L000") {
 	       			alert(data.messages + ": " +  data.solution);
 	       			location.replace("/");
@@ -74,13 +72,29 @@
     top: 18px;
 }
 
+.main {
+	width: 100%;
+	height: 100vh;
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-moz-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;  /* 수직 정렬 */
+	-webkit-box-pack: center;
+	-moz-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center; /* 수평 정렬 */
+	}
+
 </style>
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/comm/header.jsp" %>
 	
-	<div class="container">
-		<div class="col-xl-6"></div>
+	<div class="container main">
 		<div class="col-xl-6">
 			<h1>로그인</h1>
 			<div class="mb-3 mt-3">
@@ -107,7 +121,6 @@
 				<button type="reset" class="btn btn-secondary" onClick="location.href='/'">취소</button>
 			</div>
 		</div>
-		<div class="col-xl-6"></div>
 	</div>
 	
 	<%@ include file="/WEB-INF/views/comm/footer.jsp" %>
