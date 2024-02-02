@@ -18,5 +18,7 @@ public interface MemberMapper {
 	int selectLoginById(LoginDTO loginDTO) throws SQLException, IOException;
 	//로그인 시도
 	int selectLoginMember(LoginDTO loginDTO) throws SQLException, IOException;
+	// 세션정보를 통해 PK번호 가져오기
+	int selectMemberPkByUserId(String userId) throws SQLException, IOException;
 	
 }

@@ -3,7 +3,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.rmsoft.app.mapper.SolutionMapper">
-	<select id="selectSolution" resultType="com.rmsoft.app.dto.SolutionDTO">
+	<select id="selectSolutionType" resultType="String">
+		SELECT SOLUTION_TYPE 
+		FROM SOLUTION
+		ORDER BY SOLUTION_VOLUME ASC
+	</select>
+
+	<select id="selectSolution" resultType="com.rmsoft.app.vo.SolutionVO">
 		SELECT SOLUTION_PK, SOLUTION_TYPE, ROUND(SOLUTION_VOLUME/1000000000000) AS SOLUTION_VOLUME, SOLUTION_PRICE
 		FROM SOLUTION 
 		WHERE SOLUTION_TYPE = #{choiceSolution}

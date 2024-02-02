@@ -19,56 +19,161 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		let today = new Date();
-		let today_ts = Date.parse(today);
-		let minDay = new Date(today_ts + (24 * 60 * 60 * 1000));
-		//달력
-		$('#subscribeDate').daterangepicker({
-			//buttonClasses: ['btn', 'btn-sm'],
-			//applyClass: 'btn-danger',
-			//cancelClass: 'btn-inverse',
-			startDate: today,
-			endDate: today,
-			locale: {
-				format: 'YYYY-MM-DD',
-			    separator: ' ~ ',
-			    applyLabel: '선택',
-			    cancelLabel: '취소',
-			    daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],
-			    monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-			},
-			showDropdowns: true,
-			minDate: minDay,
-			//maxDate:,    //최대제한날짜
-		  });
-
-		// 솔루션 선택
+		getSolutionType();
+		daterangepicker();
+		
+		//데이터피커 변경시 포멧변경
+		$('#subscribeDate').on('apply.daterangepicker', (e, picker) => {
+			let diffMonths = picker.chosenLabel.split('개월')[0];
+			$('#diffMonths').val(diffMonths);
+			formatDate(picker.startDate, picker.endDate);
+			outputPrice();
+		});
+		
+		// 솔루션 선택시
 		$('#solution').change(function() {
 			let choiceSolution = $('#solution').val();
 			if(choiceSolution != "") {
-				$.ajax({
-	    	   	  url : 'subscribe/solution/' + choiceSolution,
-	        	  type : 'get',
-	        	  headers : {"content-type":"application/json"},
-	        	  dataType : 'json',
-	        	  async : false,
-	        	  success: function(data) {
-	        		console.log(data)
-	        		if(data.code == "000") {
-	        			
-		        	} 
-	        	  },
-	        	  error: function(request, status, error) {
-	        		  console.log(status);
-	        		  console.log(error);
-	        		  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
-	        	  }
-				});
+				getSolutionInfo(choiceSolution);
 			}
 		});
+		
 	});
-
 	
+	//데이터피커함수
+	function daterangepicker() {
+		let start = moment();
+		let end = moment().add(1, 'M');
+		
+		//데이터피커
+		$('#subscribeDate').daterangepicker({
+			startDate: start,
+		    endDate: end,
+		    showCustomRangeLabel: false,
+		    ranges: {
+		    	'1개월': [moment(), moment().add(1, 'M')],
+		    	'3개월': [moment(), moment().add(3, 'M')],
+		        '6개월': [moment(), moment().add(6, 'M')],
+		        '12개월': [moment(), moment().add(1, 'y')]
+		    }
+		});
+		//처음 날짜 포멧변경
+		formatDate(start, end);
+	}
+	
+	//데이터피커 날짜 포멧함수
+	function formatDate(start, end) {
+		$('#subscribeDate').val(start.format('YYYY/MM/DD') + ' ~ ' + end.format('YYYY/MM/DD'));
+	}
+	
+	
+	// 솔루션 타입 받아오기
+	function getSolutionType(){
+		$.ajax({
+	    	  url : 'subscribe/solution',
+	          type : 'get',
+	          headers : {"content-type":"application/json"},
+	          dataType : 'json',
+	          async : false,
+	          success: function(data) {
+	        	if(data.code == "000") {
+	        		outputSolutionType(data.data);
+		       	} 
+	          },
+	          error: function(request, status, error) {
+	        	  console.log(status);
+	        	  console.log(error);
+	        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	          }
+		});
+	}
+	
+	//솔루션 선택시 정보 받아오는 함수
+	function getSolutionInfo(choiceSolution) {
+		$.ajax({
+    	  url : 'subscribe/solution/' + choiceSolution,
+          type : 'get',
+          headers : {"content-type":"application/json"},
+          dataType : 'json',
+          async : false,
+          success: function(data) {
+        	console.log(data)
+        	if(data.code == "000") {
+        		// 성공했을때 할일
+        		outputSolutionInfo(data.data);
+	       	} 
+          },
+          error: function(request, status, error) {
+        	  console.log(status);
+        	  console.log(error);
+        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+          }
+		});
+	};
+	
+	// 구독하기
+	function subscribe() {
+		let data = {
+				solutionType: $('#solution').val(),
+				subscribeDate : $('#subscribeDate').val(),
+				solutionPrice : $('#priceInt').val(),
+				diffMonths :$('#diffMonths').val()
+		}
+		console.log(data);
+		
+		$.ajax({
+	    	  url : 'subscribe',
+	          type : 'POST',
+	          headers : {"content-type":"application/json"},
+	          data : JSON.stringify(data),
+	          dataType : 'json',
+	          async : false,
+	          success: function(data) {
+	        	console.log(data)
+	        	if(data.code == "000") {
+	        		// 성공했을때 할일
+		       	} 
+	          },
+	          error: function(request, status, error) {
+	        	  console.log(status);
+	        	  console.log(error);
+	        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	          }
+			});
+	}
+	
+	//솔루션타입 표시
+	function outputSolutionType(solutionTypeList) {
+		let output = '<option value="">솔루션을 선택하세요.</option>';
+
+		$.each(solutionTypeList, function(i, solutionType) {
+			output +=`<option value="\${solutionType}">\${solutionType}</option>`;
+		})
+		
+		$('#solution').html(output);
+	}
+	
+	//솔루션정보 표시
+	function outputSolutionInfo(solutionInfo) {
+		let outputVolume = `\${solutionInfo.solution_volume}TB`;
+		$('#volume').val(outputVolume);
+		$('#priceInt').val(solutionInfo.solution_price);
+		outputPrice();
+	}
+	
+	//가격 표시
+	function outputPrice() {
+		let price = Number($('#priceInt').val());
+		let date = $('#subscribeDate').val();
+		let startDate = date.split(' ~ ')[0];
+		let endDate = date.split(' ~ ')[1];
+		let diffMonths = $('#diffMonths').val();
+		
+		let outputSolutionPrice = `\${price.toLocaleString('ko-KR')}원 * \${diffMonths}개월 = \${(price * diffMonths).toLocaleString('ko-KR')}원`;
+		$('#price').val(outputSolutionPrice);
+	}
+	
+
 	
 </script>
 
@@ -107,36 +212,24 @@
 			<div class="mb-3 mt-3">
 				<label for=solution class="form-label">솔루션</label>
 				<select class="form-select" id="solution">
-						<option value="">솔루션을 선택하세요.</option>
-						<option value="Basic">Basic</option>
-						<option value="Standard">Standard</option>
-						<option value="Premium">Premium</option>
 				</select>
 			</div>
 
 			<div class="mb-3 mt-3 volume">
 				<label for=volume class="form-label">스토리지 용량</label>
-				<select class="form-select" id="volume">
-						<option value="10TB">10TB</option>
-						<option value="30TB">30TB</option>
-						<option value="50TB">50TB</option>
-						<option value="100TB">100TB</option>
-				</select>
-			</div>
-
-			<div class="mb-3 mt-3">
-				<label for="price" class="form-label">단가(1일기준)</label>
-				<input type="text" class="form-control" id="price" value="" readonly="readonly"/>
+				<input type="text" class="form-control" id="volume" value="" readonly="readonly" />
 			</div>
 
 			<div class="mb-3 mt-3">
 				<label for="subscribeDate" class="form-label">구독기간</label>
-				<input type="text" class="form-control" id="subscribeDate" value="" />
+				<input type="text" class="form-control" id="subscribeDate" value="구독기간을 선택하세요." />
+				<input type="hidden" id="diffMonths" value="1" />
 			</div>
 			
 			<div class="mb-3 mt-3">
 				<label for="price" class="form-label">총 가격</label>
 				<input type="text" class="form-control" id="price" value="" readonly="readonly"/>
+				<input type="hidden" id="priceInt" value="" />
 			</div>
 
 			<div class="mb-3 mt-3">

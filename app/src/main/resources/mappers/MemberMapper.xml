@@ -28,4 +28,10 @@
 			AND USER_PASSWORD = SHA2(#{userPassword}, 256)
 	</select>
 	
+	<select id="selectMemberPkByUserId" resultType="int">
+		SELECT MEMBER_PK 
+		FROM MEMBER 
+		WHERE USER_ID = #{userId} 
+	</select>
+	
 </mapper>

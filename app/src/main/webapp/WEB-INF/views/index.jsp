@@ -12,33 +12,27 @@
 <title>Index</title>
 
 <script>
-$(function() {
-		let today = new Date();
-		let today_ts = Date.parse(today);
-		
-		let minDay = new Date(today_ts + (24 * 60 * 60 * 1000));
+	$(function() {
+		let today = moment();
 
-		 $('#daterange').daterangepicker({
-			  //buttonClasses: ['btn', 'btn-sm'],
-			    //applyClass: 'btn-danger',
-			    //cancelClass: 'btn-inverse',
-			    startDate: today,
-			    endDate: today,
-			    locale: {
-			      format: 'YYYY-MM-DD',
-			      separator: ' ~ ',
-			      applyLabel: '선택',
-			      cancelLabel: '취소',
-			      daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],
-			      monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-			    },
-			    showDropdowns: true,
-			    minDate: minDay,
-			    //maxDate:,    //최대제한날짜
-		  });
+		$('#reportrange').daterangepicker({
+			startDate: today,
+		    endDate: today,
+		    showCustomRangeLabel: false,
+		    ranges: {
+		    	'1달': [moment(), moment().add(1, 'M')],
+		    	'3달': [moment(), moment().add(3, 'M')],
+		        '6달': [moment(), moment().add(6, 'M')],
+		        '1년': [moment(), moment().add(1, 'y')]
+		    }
+		}, cb);
+		cb(start, end);
 
-  
-});
+	});
+
+	function cb(start, end) {
+		$('#reportrange span').html(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
+	}
 
 </script>
 
@@ -49,9 +43,10 @@ $(function() {
 	<div>index</div>
 	<div>${sessionScope.loginMember}</div>
 	<div>
-		<div class="example">
-        	<p class="mb-1">Date Range Pick</p>
-        	<input type="text" id="daterange" name="daterange" value="01/01/2018 - 01/15/2018" />
+		<div id="reportrange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+        	<i class="fa fa-calendar"></i>&nbsp;
+    		<span></span>
+    		<i class="fa fa-caret-down"></i>
         </div>
 	</div>
 
