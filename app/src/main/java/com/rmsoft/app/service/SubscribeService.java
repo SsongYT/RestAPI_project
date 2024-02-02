@@ -19,9 +19,11 @@ import com.rmsoft.app.etc.ResponseData;
 import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.mapper.MemberMapper;
 import com.rmsoft.app.mapper.PaymentMapper;
+import com.rmsoft.app.mapper.ServerMapper;
 import com.rmsoft.app.mapper.SolutionMapper;
 import com.rmsoft.app.mapper.SubscribeMapper;
 import com.rmsoft.app.vo.PaymentVO;
+import com.rmsoft.app.vo.ServerVO;
 import com.rmsoft.app.vo.SolutionVO;
 import com.rmsoft.app.vo.SubscribeVO;
 
@@ -32,12 +34,14 @@ public class SubscribeService {
 	private final SubscribeMapper subscribeMapper;
 	private final MemberMapper memberMapper;
 	private final PaymentMapper paymentMapper;
+	private final ServerMapper serverMapper;
 	
-	public SubscribeService(SolutionMapper solutionMapper, SubscribeMapper subscribeMapper, MemberMapper memberMapper, PaymentMapper paymentMapper) {
+	public SubscribeService(SolutionMapper solutionMapper, SubscribeMapper subscribeMapper, MemberMapper memberMapper, PaymentMapper paymentMapper, ServerMapper serverMapper) {
 		this.solutionMapper = solutionMapper;
 		this.subscribeMapper = subscribeMapper;
 		this.memberMapper = memberMapper;
 		this.paymentMapper = paymentMapper;
+		this.serverMapper = serverMapper;
 	}
 	
 	//페이지 접속후 솔루션 타입 받아오기
@@ -77,19 +81,14 @@ public class SubscribeService {
 	//구독서비스 저장
 	public ResponseData inputSubscribe(SubscribeDTO subscribeDTO, String userId) throws SQLException, IOException {
 		ResponseData responseData = new ResponseData();
-		System.out.println("========서비스단 도착============");
 		int memberPk = memberMapper.selectMemberPkByUserId(userId);
-		System.out.println(memberPk);
 		
 		Map<String, LocalDateTime> dateData = dateFormat(subscribeDTO.getSubscribeDate());
 		
 		int diffMonths = subscribeDTO.getDiffMonths();
 		
 		SolutionVO solutionData = solutionMapper.selectSolution(subscribeDTO.getSolutionType());
-		System.out.println(solutionData);
-		System.out.println("========solutionData===========");
 		int price = (solutionData.getSolution_price() * diffMonths);
-		
 		
 		if(subscribeDTO.getSolutionPrice() == price) {
 			//VO set
@@ -98,19 +97,27 @@ public class SubscribeService {
 			subscribeVO.setSolution_no(solutionData.getSolution_pk());
 			subscribeVO.setStart_dt(dateData.get("startDate"));
 			subscribeVO.setEnd_dt(dateData.get("endDate"));
-			// 구독 저장
-			int a = subscribeMapper.insertSubscribe(subscribeVO);
-			System.out.println(a);
-			System.out.println("========a===========");
-			if( a == 1) {
+			// 구독 저장 (selectKey로 PK값 받아옴)
+			subscribeMapper.insertSubscribe(subscribeVO);
+			if(subscribeVO.getSubscribe_pk() != 0) {
 				// 구독 저장 성공
 				PaymentVO paymentVO = new PaymentVO();
+				paymentVO.setSubscribe_no(subscribeVO.getSubscribe_pk());
 				paymentVO.setPayment_type("카드");
-				//paymentVO.setPayment_st("1");      //1(결제후-디폴트), 0(결제전)
+				paymentVO.setPayment_st("1");      //1(결제후-디폴트), 0(결제전)
 				paymentVO.setPayment_price(price);
 				// 결제 저장
 				if(paymentMapper.insertPayment(paymentVO) == 1) {
 					// 결제 저장 성공
+					ServerVO serverVO = new ServerVO();
+					serverVO.setMember_no(memberPk);
+					// 서버 저장
+					if(serverMapper.insertServer(serverVO) == 1) {
+						//서버 저장 성공
+						responseData.setCode(ResponseDataEnum.basic_true.getCode());
+						responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
+						responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+					}
 				} else {
 					// 결제 저장 실패
 				}

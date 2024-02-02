@@ -9,7 +9,7 @@ import com.rmsoft.app.vo.PaymentVO;
 
 @Mapper
 public interface PaymentMapper {
-
+	//결제정보 저장
 	int insertPayment(PaymentVO paymentVO) throws SQLException, IOException;
 
 }

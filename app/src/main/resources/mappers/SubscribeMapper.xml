@@ -3,11 +3,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.rmsoft.app.mapper.SubscribeMapper">
-	<insert id="insertSubscribe">
+	<insert id="insertSubscribe" parameterType="com.rmsoft.app.vo.SubscribeVO">
 		INSERT INTO SUBSCRIBE (MEMBER_NO, SOLUTION_NO, START_DT, END_DT) 
 		VALUES (#{member_no}, #{solution_no}, #{start_dt}, #{end_dt})
 		<selectKey resultType="int" keyProperty="subscribe_pk" order="AFTER">
-			SELECT LAST_INSERT_ID();
+			SELECT LAST_INSERT_ID()
 		</selectKey>
 	</insert>
 </mapper>

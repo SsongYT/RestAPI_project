@@ -4,6 +4,7 @@
 
 <mapper namespace="com.rmsoft.app.mapper.PaymentMapper">
 	<insert id="insertPayment">
-		
+		INSERT INTO PAYMENT (SUBSCRIBE_NO, PAYMENT_TYPE, PAYMENT_ST, PAYMENT_PRICE) 
+		VALUES (#{subscribe_no}, #{payment_type}, #{payment_st}, #{payment_price})
 	</insert>
 </mapper>
