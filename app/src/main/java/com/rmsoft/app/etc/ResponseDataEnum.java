@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ResponseDataEnum {
 	
 	basic_true("000", "성공", null),
+	basic_false("001", "데이터없음", "데이터정보를 확인해주세요."),
 	
 	check_id_true("CI000", "사용가능", "사용가능합니다."),
 	check_id_false("CI001", "아이디 중복", "다른 아이디를 사용해주세요."),

@@ -7,10 +7,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class SubscribeDTO {
+public class SubscribeModifyDTO {
 	private String solutionType;
 	private String startDate;
 	private String endDate;
-	private int solutionPrice;
-	private int diffMonths;
 }

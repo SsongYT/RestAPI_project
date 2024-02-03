@@ -2,19 +2,14 @@ package com.rmsoft.app.service;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.rmsoft.app.dto.SubscribeDTO;
+import com.rmsoft.app.dto.SubscribeModifyDTO;
 import com.rmsoft.app.etc.ResponseData;
 import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.mapper.MemberMapper;
@@ -56,6 +51,9 @@ public class SubscribeService {
 			responseData.setData(solutionTypeList);
 		} else {
 			// 에러
+			responseData.setCode(ResponseDataEnum.basic_false.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
+			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
 		}
 		
 		return responseData;
@@ -73,35 +71,36 @@ public class SubscribeService {
 			responseData.setData(solutionData);
 		} else {
 			// 에러
+			responseData.setCode(ResponseDataEnum.basic_false.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
+			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
 		}		
 		
 		return responseData;
 	}
 	
-	//구독서비스 저장
+	//구독정보 저장
 	public ResponseData inputSubscribe(SubscribeDTO subscribeDTO, String userId) throws SQLException, IOException {
 		ResponseData responseData = new ResponseData();
 		int memberPk = memberMapper.selectMemberPkByUserId(userId);
-		
-		Map<String, LocalDateTime> dateData = dateFormat(subscribeDTO.getSubscribeDate());
 		
 		int diffMonths = subscribeDTO.getDiffMonths();
 		
 		SolutionVO solutionData = solutionMapper.selectSolution(subscribeDTO.getSolutionType());
 		int price = (solutionData.getSolution_price() * diffMonths);
-		
+
 		if(subscribeDTO.getSolutionPrice() == price) {
 			//VO set
 			SubscribeVO subscribeVO = new SubscribeVO();
 			subscribeVO.setMember_no(memberPk);
 			subscribeVO.setSolution_no(solutionData.getSolution_pk());
-			subscribeVO.setStart_dt(dateData.get("startDate"));
-			subscribeVO.setEnd_dt(dateData.get("endDate"));
+			subscribeVO.setStart_dt(dateFormat(subscribeDTO.getStartDate()));
+			subscribeVO.setEnd_dt(dateFormat(subscribeDTO.getEndDate()));
 			// 구독 저장 (selectKey로 PK값 받아옴)
 			subscribeMapper.insertSubscribe(subscribeVO);
 			if(subscribeVO.getSubscribe_pk() != 0) {
 				// 구독 저장 성공
-				PaymentVO paymentVO = new PaymentVO();
+				PaymentVO paymentVO = new PaymentVO(); 
 				paymentVO.setSubscribe_no(subscribeVO.getSubscribe_pk());
 				paymentVO.setPayment_type("카드");
 				paymentVO.setPayment_st("1");      //1(결제후-디폴트), 0(결제전)
@@ -110,14 +109,23 @@ public class SubscribeService {
 				if(paymentMapper.insertPayment(paymentVO) == 1) {
 					// 결제 저장 성공
 					ServerVO serverVO = new ServerVO();
-					serverVO.setMember_no(memberPk);
+					serverVO.setSubscribe_no(subscribeVO.getSubscribe_pk());
+					
+					
+					
+					// 여기를... REST로???
 					// 서버 저장
 					if(serverMapper.insertServer(serverVO) == 1) {
 						//서버 저장 성공
 						responseData.setCode(ResponseDataEnum.basic_true.getCode());
 						responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
 						responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+					} else {
+						// 서버 저장 실패
 					}
+					
+					
+					
 				} else {
 					// 결제 저장 실패
 				}
@@ -133,22 +141,21 @@ public class SubscribeService {
 		
 	}
 	
-	//날짜 변환하기
-	public Map<String, LocalDateTime> dateFormat(String stringDate) {
-		Map<String, LocalDateTime> dateData = new HashMap<String, LocalDateTime>();
+	
+	//구독정보 변경
+	public ResponseData modifySubscribe(SubscribeModifyDTO subscribeModifyDTO, String userId) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
+		int memberPk = memberMapper.selectMemberPkByUserId(userId);
 		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		
-		//날짜 받아오기
-		String[] dateArr = stringDate.split(" ~ ");
-		String startStr = dateArr[0];
-		String endStr = dateArr[1];
-		LocalDateTime startDate = LocalDateTime.parse(startStr + " 00:00:00", formatter);
-		LocalDateTime endDate = LocalDateTime.parse(endStr + " 23:59:59", formatter);
-		dateData.put("startDate", startDate);
-		dateData.put("endDate", endDate);	
-		
-		return dateData;
+		return responseData;
 	}
 
+	
+	//날짜 변환하기
+	public LocalDateTime dateFormat(String date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime localDateTime = LocalDateTime.parse(date + " 00:00:00", formatter);
+		return localDateTime;
+	}
 }

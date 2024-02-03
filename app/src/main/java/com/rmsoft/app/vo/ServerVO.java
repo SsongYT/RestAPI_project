@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class ServerVO {
 	private int server_pk;
-	private int member_no;
+	private int subscribe_no;
 	private int volume_usage;
 }

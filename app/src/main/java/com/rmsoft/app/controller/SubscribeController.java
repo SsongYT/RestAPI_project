@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rmsoft.app.dto.SubscribeDTO;
+import com.rmsoft.app.dto.SubscribeModifyDTO;
 import com.rmsoft.app.etc.ResponseData;
 import com.rmsoft.app.service.SubscribeService;
 
@@ -43,7 +45,7 @@ public class SubscribeController {
 			
 		} catch (SQLException | IOException e) {
 			e.printStackTrace();
-			httpStatus = HttpStatus.BAD_GATEWAY;
+			
 		}
 		
 		
@@ -67,29 +69,62 @@ public class SubscribeController {
 			
 		} catch (SQLException | IOException e) {
 			e.printStackTrace();
-			httpStatus = HttpStatus.BAD_GATEWAY;
+			
 		}
 		
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
+	//구독정보 저장
 	@PostMapping(value = "subscribe")
 	public ResponseEntity<ResponseData> inputSubscribe(@RequestBody SubscribeDTO subscribeDTO, HttpSession session) {
 		String userId= (String)session.getAttribute("loginMember");
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
-
-		try {
-			responseData = subscribeService.inputSubscribe(subscribeDTO, userId);
-			httpStatus = HttpStatus.OK;
+		
+		
+		
+		if(userId != null) {
+			try {
+				responseData = subscribeService.inputSubscribe(subscribeDTO, userId);
+				httpStatus = HttpStatus.OK;
+				
+			} catch (SQLException | IOException e) {
+				
+				e.printStackTrace();
+				
+			}
 			
-		} catch (SQLException | IOException e) {
+		} else {
+			// 세션 에러
+		}
 
-			e.printStackTrace();
-			httpStatus = HttpStatus.BAD_GATEWAY;
+		return new ResponseEntity<ResponseData>(responseData, httpStatus);
+	}
+	
+	//구독 정보 변경
+	@PatchMapping(value="subscribe")
+	public ResponseEntity<ResponseData> modifySubscribe(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
+		String userId= (String)session.getAttribute("loginMember");
+		ResponseData responseData = null;
+		HttpStatus httpStatus = null;
+		
+		if(userId != null) {
+			try {
+				
+				subscribeService.modifySubscribe(SubscribeModifyDTO, userId);
+				
+			} catch (SQLException | IOException e) {
+
+				e.printStackTrace();
+			}
+			
+		} else {
+			// 세션 에러
 		}
 		
+		//로직 구현
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}

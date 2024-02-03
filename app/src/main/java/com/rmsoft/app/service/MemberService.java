@@ -20,33 +20,53 @@ public class MemberService {
 		this.memberMapper = memberMapper;
 	}
 	
-	public boolean checkId(String checkId) throws SQLException, IOException {
-		boolean reselt = false;
+	public ResponseData hasMemberId(String checkId) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
 		if(memberMapper.selectMemberById(checkId) == 0) {
-			reselt = true;
-		}
-		return reselt;
-	}
-	
-//	public boolean checkEmail(String checkemail) {
-//		boolean reselt = false;
-//		
-//		//디비 where = {checkid} 로우가 있으면 사용불가능 , 없으면 사용가능
-//		if(!checkemail.equals("aaa")) {
-//			reselt = true;
-//		}
-//		
-//		return reselt;
-//	}
-
-	public boolean inputMember(MemberDTO memberDTO) throws SQLException, IOException {
-		boolean reselt = false;
-
-		if(memberMapper.insertMember(memberDTO) == 1) {
-			reselt = true;
+			responseData.setCode(ResponseDataEnum.check_id_true.getCode());
+			responseData.setMessages(ResponseDataEnum.check_id_true.getMessages());
+			responseData.setSolution(ResponseDataEnum.check_id_true.getSolution());
+		} else {
+			responseData.setCode(ResponseDataEnum.check_id_false.getCode());
+			responseData.setMessages(ResponseDataEnum.check_id_false.getMessages());
+			responseData.setSolution(ResponseDataEnum.check_id_false.getSolution());
 		}
 		
-		return reselt;
+		return responseData;
+	}
+
+	public ResponseData inputMember(MemberDTO memberDTO) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
+		
+		if(memberMapper.insertMember(memberDTO) == 1) {
+			responseData.setCode(ResponseDataEnum.signup_true.getCode());
+			responseData.setMessages(ResponseDataEnum.signup_true.getMessages());
+			responseData.setSolution(ResponseDataEnum.signup_true.getSolution());
+		} else {
+			responseData.setCode(ResponseDataEnum.signup_false.getCode());
+			responseData.setMessages(ResponseDataEnum.signup_false.getMessages());
+			responseData.setSolution(ResponseDataEnum.signup_false.getSolution());
+		}
+		
+		return responseData;
+	}
+	
+	public ResponseData deleteMember(int deletePK) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
+		
+		if(memberMapper.deleteMember(deletePK) == 1) {
+			//성공
+			responseData.setCode(ResponseDataEnum.basic_true.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
+			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+		} else {
+			//실패
+			responseData.setCode(ResponseDataEnum.basic_false.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
+			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
+		}
+		
+		return responseData;
 	}
 
 	public ResponseData canLoginMember(LoginDTO loginDTO) throws SQLException, IOException {
@@ -71,5 +91,7 @@ public class MemberService {
 		
 		return responseData;
 	}
+
+	
 
 }

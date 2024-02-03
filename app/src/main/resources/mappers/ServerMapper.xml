@@ -7,4 +7,10 @@
 		INSERT INTO SERVER (MEMBER_NO) 
 		VALUES (#{member_no})
 	</insert>
+	
+	<select id="selectServerVolumeUsage" resultType="com.rmsoft.app.vo.ServerVO">
+		SELECT *   
+		FROM SERVER 
+		WHERE SUBSCRIBE_NO = #{subscribePK}
+	</select>
 </mapper>

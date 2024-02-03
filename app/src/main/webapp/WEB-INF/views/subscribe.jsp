@@ -63,9 +63,8 @@
 	
 	//데이터피커 날짜 포멧함수
 	function formatDate(start, end) {
-		$('#subscribeDate').val(start.format('YYYY/MM/DD') + ' ~ ' + end.format('YYYY/MM/DD'));
+		$('#subscribeDate').val(start.format('YYYY-MM-DD') + ' ~ ' + end.format('YYYY-MM-DD'));
 	}
-	
 	
 	// 솔루션 타입 받아오기
 	function getSolutionType(){
@@ -113,14 +112,18 @@
 	
 	// 구독하기
 	function subscribe() {
+		let date = $('#subscribeDate').val();
+		let startDate = date.split(' ~ ')[0];
+		let endDate = date.split(' ~ ')[1];
+		
 		let data = {
 				solutionType: $('#solution').val(),
-				subscribeDate : $('#subscribeDate').val(),
+				startDate : startDate,
+				endDate : endDate,
 				solutionPrice : $('#priceInt').val(),
 				diffMonths :$('#diffMonths').val()
 		}
-		console.log(data);
-		
+
 		$.ajax({
 	    	  url : 'subscribe',
 	          type : 'POST',
@@ -164,9 +167,6 @@
 	//가격 표시
 	function outputPrice() {
 		let price = Number($('#priceInt').val());
-		let date = $('#subscribeDate').val();
-		let startDate = date.split(' ~ ')[0];
-		let endDate = date.split(' ~ ')[1];
 		let diffMonths = $('#diffMonths').val();
 		
 		let outputSolutionPrice = `\${price.toLocaleString('ko-KR')}원 * \${diffMonths}개월 = \${(price * diffMonths).toLocaleString('ko-KR')}원`;
