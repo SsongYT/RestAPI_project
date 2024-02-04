@@ -103,10 +103,41 @@ public class SubscribeController {
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
-	//구독 정보 변경
+	//구독정보 변경시 데이터 얻기
+	@GetMapping(value="subscribe/payment")
+	public ResponseEntity<ResponseData> findModifySubscribeData(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
+		//세션에러 방지용
+		//String userId= (String)session.getAttribute("loginMember");
+		String userId = "test5";
+		
+		ResponseData responseData = null;
+		HttpStatus httpStatus = null;
+		
+		if(userId != null) {
+			try {
+				
+				responseData = subscribeService.findModifySubscribeData(SubscribeModifyDTO, userId);
+				httpStatus = HttpStatus.OK;
+				
+			} catch (SQLException | IOException e) {
+
+				e.printStackTrace();
+			}
+			
+		} else {
+			// 세션 에러
+		}
+		
+		return new ResponseEntity<ResponseData>(responseData, httpStatus);
+	}
+	
+	//구독정보 변경
 	@PatchMapping(value="subscribe")
 	public ResponseEntity<ResponseData> modifySubscribe(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
-		String userId= (String)session.getAttribute("loginMember");
+		//세션에러 방지용
+		//String userId= (String)session.getAttribute("loginMember");
+		String userId = "test5";
+		
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
 		
@@ -116,7 +147,7 @@ public class SubscribeController {
 				subscribeService.modifySubscribe(SubscribeModifyDTO, userId);
 				
 			} catch (SQLException | IOException e) {
-
+				
 				e.printStackTrace();
 			}
 			

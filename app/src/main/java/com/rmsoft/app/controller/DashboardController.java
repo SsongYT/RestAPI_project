@@ -46,13 +46,13 @@ public class DashboardController {
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine = in.readLine();
 			
-	        ObjectMapper mapper = new ObjectMapper();
-	        Map<String, Object> returnMap = mapper.readValue(inputLine, Map.class);
-
-	        responseData.setCode((String)returnMap.get("code"));
-	        responseData.setMessages((String)returnMap.get("messages"));
-	        responseData.setSolution((String)returnMap.get("solution"));
-	        responseData.setData(returnMap.get("data"));
+//	        ObjectMapper mapper = new ObjectMapper();
+//	        Map<String, Object> returnMap = mapper.readValue(inputLine, Map.class);
+//
+//	        responseData.setCode((String)returnMap.get("code"));
+//	        responseData.setMessages((String)returnMap.get("messages"));
+//	        responseData.setSolution((String)returnMap.get("solution"));
+//	        responseData.setData(returnMap.get("data"));
 
 	        httpStatus = HttpStatus.OK;
 	        

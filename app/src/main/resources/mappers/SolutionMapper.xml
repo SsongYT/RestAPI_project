@@ -9,10 +9,15 @@
 		ORDER BY SOLUTION_VOLUME ASC
 	</select>
 
-	<select id="selectSolution" resultType="com.rmsoft.app.vo.SolutionVO">
+	<select id="selectSolutionBySolutionType" resultType="com.rmsoft.app.vo.SolutionVO">
 		SELECT SOLUTION_PK, SOLUTION_TYPE, ROUND(SOLUTION_VOLUME/1000000000000) AS SOLUTION_VOLUME, SOLUTION_PRICE
 		FROM SOLUTION 
 		WHERE SOLUTION_TYPE = #{choiceSolution}
-		ORDER BY SOLUTION_VOLUME ASC
+	</select>
+	
+	<select id="selectSolutionBySolutionPk" resultType="com.rmsoft.app.vo.SolutionVO">
+		SELECT SOLUTION_PK, SOLUTION_TYPE, ROUND(SOLUTION_VOLUME/1000000000000) AS SOLUTION_VOLUME, SOLUTION_PRICE
+		FROM SOLUTION 
+		WHERE SOLUTION_PK = #{solutionNo}
 	</select>
 </mapper>

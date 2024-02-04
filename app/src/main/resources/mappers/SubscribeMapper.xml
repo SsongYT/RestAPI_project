@@ -10,4 +10,23 @@
 			SELECT LAST_INSERT_ID()
 		</selectKey>
 	</insert>
+	
+	<select id="selectSubscribeByMemberPk" resultType="com.rmsoft.app.vo.SubscribeVO">
+		SELECT * 
+		FROM SUBSCRIBE 
+		WHERE MEMBER_NO = #{memberPk}
+	</select>
+	
+	<update id="updateSubscribeEndDT" parameterType="com.rmsoft.app.vo.SubscribeVO">
+		UPDATE SUBSCRIBE 
+		SET END_DT = #{end_dt}, MODIFIED_DT = now() 
+		WHERE MEMBER_NO = #{memeber_no} 
+			AND USE_ST = 'Y'
+		<selectKey resultType="int" keyProperty="subscribe_pk" order="AFTER">
+			SELECT SUBSCRIBE_PK 
+			FROM SUBSCRIBE 
+			WHERE MEMBER_NO = #{memeber_no} 
+				AND USE_ST = 'Y'
+		</selectKey>
+	</update>
 </mapper>
