@@ -25,6 +25,8 @@ import com.rmsoft.app.vo.ServerVO;
 import com.rmsoft.app.vo.SolutionVO;
 import com.rmsoft.app.vo.SubscribeVO;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class SubscribeService {
 	
@@ -50,13 +52,12 @@ public class SubscribeService {
 		if(solutionTypeList.size() != 0) {
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
 			responseData.setData(solutionTypeList);
 		} else {
 			// 에러
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
+
 		}
 		
 		return responseData;
@@ -70,13 +71,12 @@ public class SubscribeService {
 		if(solutionData != null) {
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
 			responseData.setData(solutionData);
 		} else {
 			// 에러
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
+
 		}		
 		
 		return responseData;
@@ -87,7 +87,7 @@ public class SubscribeService {
 		ResponseData responseData = new ResponseData();
 		int memberPk = memberMapper.selectMemberPkByUserId(userId);
 		
-		int diffMonths = subscribeDTO.getDiffMonths();
+		int diffMonths = compareMonth(dateFormat(subscribeDTO.getStartDate()), dateFormat(subscribeDTO.getEndDate()));
 		
 		SolutionVO solutionData = solutionMapper.selectSolutionBySolutionType(subscribeDTO.getSolutionType());
 		int price = (solutionData.getSolution_price() * diffMonths);
@@ -99,6 +99,7 @@ public class SubscribeService {
 			subscribeVO.setSolution_no(solutionData.getSolution_pk());
 			subscribeVO.setStart_dt(dateFormat(subscribeDTO.getStartDate()));
 			subscribeVO.setEnd_dt(dateFormat(subscribeDTO.getEndDate()));
+			subscribeVO.setUse_st('Y');
 			// 구독 저장 (selectKey로 PK값 받아옴)
 			subscribeMapper.insertSubscribe(subscribeVO);
 			if(subscribeVO.getSubscribe_pk() != 0) {
@@ -123,7 +124,7 @@ public class SubscribeService {
 						//서버 저장 성공
 						responseData.setCode(ResponseDataEnum.basic_true.getCode());
 						responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-						responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+
 					} else {
 						// 서버 저장 실패
 					}
@@ -154,77 +155,117 @@ public class SubscribeService {
 		// 기존 구독의 솔루션 정보
 		SolutionVO solutionVO =  solutionMapper.selectSolutionBySolutionPk(subscribeVO.getSolution_no());
 		
-		int computePrice = computePrice(subscribeModifyDTO, subscribeVO, solutionVO);
+		int computePrice = computePrice(subscribeModifyDTO, subscribeVO, solutionVO);		
 		
 		if(computePrice != -1) {
 			//변경될 금액이 있다.	
-			subscribeModifyDTO.setComputePrice(computePrice);
+			Map<String, Integer> map = new HashMap<String, Integer>();
+			map.put("computePrice", computePrice);
 			
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
-			responseData.setData(subscribeModifyDTO);
+			responseData.setData(map);
 			
 		} else {
 			// 변경이 없는데 온것 예외처리
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
 		}
 		
 		return responseData;
 	}
 	
 	//구독정보 변경
+	@Transactional(rollbackOn = Exception.class)
 	public ResponseData modifySubscribe(SubscribeModifyDTO subscribeModifyDTO, String userId) throws SQLException, IOException {
 		ResponseData responseData = new ResponseData();
+		boolean isVerify = false;
 		
+		//유저 PK 얻기
 		int memberPk = memberMapper.selectMemberPkByUserId(userId);
-		
-		
-		if(subscribeModifyDTO.getModifySolutionType() == null) {
-			// 기간만 변경 , 혹은 취소
-			// end_dt : Mend_dt
 
-			// 2. 구독정보 업데이트
-			// 3. 결제정보 인설트
-			
-		} else {
-			// 종류만 혹은 종류+기간
-			//1. 종류만 -> 어차피 기간이 null
-			//2. 종류+시간 -> end_dt : MStart_dt
-			// 1. 구독정보 인설트
-			// 2. 구독정보 업데이트
-			// 3. 결제정보 인설트
-		}
+		// 구독정보 업데이트용 VO 얻기
+		SubscribeVO subscribeVO = subscribeMapper.selectSubscribeByMemberPk(memberPk);
 		
-		SubscribeVO subscribeVO = new SubscribeVO();
-		subscribeVO.setMember_no(memberPk);
-		subscribeVO.setEnd_dt(dateFormat(subscribeModifyDTO.getModifyEndDate()));
-		System.out.println(subscribeVO);
-		// 구독정보 업데이트
-		subscribeMapper.updateSubscribeEndDT(subscribeVO);
-		if(subscribeVO.getSubscribe_pk() != 0) {
-			PaymentVO paymentVO = new PaymentVO();
+		//결제 정보 인설트용 VO 생성
+		PaymentVO paymentVO = new PaymentVO();
+		
+		// subscribeModifyDTO에 따라 구분
+		if(subscribeModifyDTO.getModifySolutionType() == null && subscribeModifyDTO.getModifyStartDate() == null) {
+			// 취소
+			// 구독을 다음달에 끝나도록 변경
+			subscribeVO.setEnd_dt(now1Month());
+			// 결제정보 설정(기존 구독정보의 PK)
 			paymentVO.setSubscribe_no(subscribeVO.getSubscribe_pk());
-			paymentVO.setPayment_type("카드");
-			paymentVO.setPayment_st("Y");      //1(결제후-디폴트), 0(결제전)
-			paymentVO.setPayment_price(subscribeModifyDTO.getModifySolutionPrice());
-			paymentVO.setPayment_dt(LocalDateTime.now());
-			// 결제 정보 인설트
-			if(paymentMapper.insertPayment(paymentVO) == 1) {
+			isVerify= true;
+			
+		} else if(subscribeModifyDTO.getModifySolutionType() == null && subscribeModifyDTO.getModifyStartDate() != null) {
+			// 기간 변경
+			//기존 구독정보 끝나는 날짜 변경
+			subscribeVO.setEnd_dt(dateFormat(subscribeModifyDTO.getModifyEndDate()));
+			// 결제정보 설정(기존 구독정보의 PK)
+			paymentVO.setSubscribe_no(subscribeVO.getSubscribe_pk());	
+			isVerify= true;
+			
+		} else if(subscribeModifyDTO.getModifySolutionType() != null) {
+			// 변경할 솔루션의 정보 얻기
+			SolutionVO modifySolutionVO = solutionMapper.selectSolutionBySolutionType(subscribeModifyDTO.getModifySolutionType());
+			
+			// 새로운 구독정보 인설트용VO
+			SubscribeVO subscribeModifyVO = new SubscribeVO();
+			subscribeModifyVO.setMember_no(memberPk);
+			subscribeModifyVO.setSolution_no(modifySolutionVO.getSolution_pk());
+			subscribeModifyVO.setUse_st('N');
+			
+			if(subscribeModifyDTO.getModifyStartDate() == null) {
+				// 혹시모를 예외 -> 디폴트값 : 다음달 설정
+				subscribeVO.setEnd_dt(now1Month());	
+				subscribeModifyVO.setStart_dt(now1Month());
+				subscribeModifyVO.setEnd_dt(subscribeVO.getEnd_dt());
 				
-			} else {
-				
+			} else if(subscribeModifyDTO.getModifyStartDate() != null) {		
+				// 종류 변경 , 기간 변경 or 기간 변경X
+				subscribeVO.setEnd_dt(dateFormat(subscribeModifyDTO.getModifyStartDate()));
+				subscribeModifyVO.setStart_dt(dateFormat(subscribeModifyDTO.getModifyStartDate()));
+				subscribeModifyVO.setEnd_dt(dateFormat(subscribeModifyDTO.getModifyEndDate()));
 			}
+			
+			// 1. 새로운 구독정보 인설트
+			subscribeMapper.insertSubscribe(subscribeModifyVO);
+			System.out.println(subscribeModifyVO);
+			if(subscribeModifyVO.getSubscribe_pk() != 0) {
+				// 결제정보 설정 (새로 인설트한 구독정보의 PK )
+				paymentVO.setSubscribe_no(subscribeModifyVO.getSubscribe_pk());
+				System.out.println(paymentVO);
+				isVerify= true;
+			}
+			
+		} 
+		
+		if(isVerify) {
+			// 2. 기존 구독정보 업데이트
+			if(subscribeMapper.updateSubscribeEndDT(subscribeVO) == 1) {
+				paymentVO.setPayment_type("카드");
+				paymentVO.setPayment_st("Y");      //1(결제후-디폴트), 0(결제전)
+				paymentVO.setPayment_price(subscribeModifyDTO.getComputePrice());
+				paymentVO.setPayment_dt(LocalDateTime.now());
+				// 3. 결제 정보 인설트
+				if(paymentMapper.insertPayment(paymentVO) == 1) {
+					responseData.setCode(ResponseDataEnum.basic_true.getCode());
+					responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
+					
+				} else {
+					// 결제 정보 인설트 실패 예외
+					throw new SQLException();
+				}
+			} else {
+				// 구독정보 업데이트 실패 예외
+				throw new SQLException();
+			}
+		} else {
+			// 결제정보 인설트에 따른 예외처리
+			throw new SQLException();
 		}
-
-		
-
-		
-	
-		
-		
 		
 		return responseData;
 	}

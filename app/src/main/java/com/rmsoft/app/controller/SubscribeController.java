@@ -144,7 +144,8 @@ public class SubscribeController {
 		if(userId != null) {
 			try {
 				
-				subscribeService.modifySubscribe(SubscribeModifyDTO, userId);
+				responseData = subscribeService.modifySubscribe(SubscribeModifyDTO, userId);
+				httpStatus = HttpStatus.OK;
 				
 			} catch (SQLException | IOException e) {
 				
@@ -154,8 +155,6 @@ public class SubscribeController {
 		} else {
 			// 세션 에러
 		}
-		
-		//로직 구현
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}

@@ -4,8 +4,8 @@
 
 <mapper namespace="com.rmsoft.app.mapper.SubscribeMapper">
 	<insert id="insertSubscribe" parameterType="com.rmsoft.app.vo.SubscribeVO">
-		INSERT INTO SUBSCRIBE (MEMBER_NO, SOLUTION_NO, START_DT, END_DT) 
-		VALUES (#{member_no}, #{solution_no}, #{start_dt}, #{end_dt})
+		INSERT INTO SUBSCRIBE (MEMBER_NO, SOLUTION_NO, START_DT, END_DT, USE_ST) 
+		VALUES (#{member_no}, #{solution_no}, #{start_dt}, #{end_dt}, #{use_st})
 		<selectKey resultType="int" keyProperty="subscribe_pk" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
@@ -14,19 +14,37 @@
 	<select id="selectSubscribeByMemberPk" resultType="com.rmsoft.app.vo.SubscribeVO">
 		SELECT * 
 		FROM SUBSCRIBE 
-		WHERE MEMBER_NO = #{memberPk}
+		WHERE MEMBER_NO = #{memberPk} 
+			AND USE_ST = 'Y'
 	</select>
 	
-	<update id="updateSubscribeEndDT" parameterType="com.rmsoft.app.vo.SubscribeVO">
+	<update id="updateSubscribeEndDT">
 		UPDATE SUBSCRIBE 
 		SET END_DT = #{end_dt}, MODIFIED_DT = now() 
-		WHERE MEMBER_NO = #{memeber_no} 
+		WHERE MEMBER_NO = #{member_no} 
 			AND USE_ST = 'Y'
-		<selectKey resultType="int" keyProperty="subscribe_pk" order="AFTER">
-			SELECT SUBSCRIBE_PK 
-			FROM SUBSCRIBE 
-			WHERE MEMBER_NO = #{memeber_no} 
-				AND USE_ST = 'Y'
-		</selectKey>
 	</update>
+	
+	<update id="schedulerSubscribeUseStY">
+		UPDATE SUBSCRIBE 
+		SET USE_ST = 'Y'
+		WHERE SUBSCRIBE_PK 
+			IN (SELECT * FROM 
+				(SELECT SUBSCRIBE_PK 
+					FROM SUBSCRIBE 
+					WHERE DATE(now()) BETWEEN START_DT AND END_DT 
+						AND USE_ST = "N")AS a);
+	</update>
+	
+	<update id="schedulerSubscribeUseStN">
+		UPDATE SUBSCRIBE 
+		SET USE_ST = 'N'
+		WHERE SUBSCRIBE_PK 
+			IN (SELECT * FROM 
+				(SELECT SUBSCRIBE_PK 
+					FROM SUBSCRIBE 
+					WHERE DATE(now()) NOT BETWEEN START_DT AND END_DT 
+						AND USE_ST = "Y")AS a);
+	</update>
+	
 </mapper>

@@ -15,4 +15,7 @@ public class SubscribeVO {
 	private int solution_no;
 	private LocalDateTime start_dt;
 	private LocalDateTime end_dt;
+	private char use_st;
+	private LocalDateTime create_dt;
+	private LocalDateTime modified_dt;
 }

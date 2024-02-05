@@ -12,5 +12,4 @@ public class SubscribeDTO {
 	private String startDate;
 	private String endDate;
 	private int solutionPrice;
-	private int diffMonths;
 }

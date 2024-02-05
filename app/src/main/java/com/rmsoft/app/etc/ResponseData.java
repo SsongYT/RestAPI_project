@@ -10,6 +10,6 @@ import lombok.ToString;
 public class ResponseData {
 	private String code;
 	private String messages;
-	private String solution;
+
 	private Object data;
 }

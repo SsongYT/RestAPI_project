@@ -15,6 +15,9 @@ public interface SubscribeMapper {
 	// 회원FK를 통해 구독정보 가져오기
 	SubscribeVO selectSubscribeByMemberPk(int memberPk) throws SQLException, IOException;
 	//구독정보 변경(구독종료일)
-	void updateSubscribeEndDT(SubscribeVO subscribeVO) throws SQLException, IOException;
-
+	int updateSubscribeEndDT(SubscribeVO subscribeVO) throws SQLException, IOException;
+	// [스케줄러] USE_ST Y변경
+	int schedulerSubscribeUseStY() throws SQLException, IOException;
+	// [스케줄러] USE_ST N변경
+	int schedulerSubscribeUseStN() throws SQLException, IOException;
 }

@@ -29,12 +29,12 @@ public class ServerService {
 			//서버 저장 성공
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+
 		} else {
 			// 서버 저장 실패
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
+
 		}
 		
 		return responseData;
@@ -51,13 +51,13 @@ public class ServerService {
 			mapData.put("voulumeUsage", serverVO.getVolume_usage());
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_true.getSolution());
+
 			responseData.setData(mapData);
 		} else {
 			//실패 로직(검색 안됨)
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-			responseData.setSolution(ResponseDataEnum.basic_false.getSolution());
+
 		}
 		
 		
