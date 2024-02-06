@@ -9,16 +9,19 @@ import org.springframework.stereotype.Service;
 
 import com.rmsoft.app.etc.ResponseData;
 import com.rmsoft.app.etc.ResponseDataEnum;
+import com.rmsoft.app.mapper.MemberMapper;
 import com.rmsoft.app.mapper.ServerMapper;
 import com.rmsoft.app.vo.ServerVO;
 
 @Service
-public class ServerService {
+public class DashboardService {
 	
 	private final ServerMapper serverMapper;
+	private final MemberMapper memberMapper;
 	
-	public ServerService(ServerMapper serverMapper) {
+	public DashboardService(ServerMapper serverMapper, MemberMapper memberMapper) {
 		this.serverMapper = serverMapper;
+		this.memberMapper = memberMapper;
 	}
 	
 	// 서버테이블 저장
@@ -41,11 +44,13 @@ public class ServerService {
 	}
 	
 	// 서버테이블 사용량 얻기
-	public ResponseData findVolumeUsage(int subscribePK) throws SQLException, IOException {
+	public ResponseData findVolumeUsage(String userId) throws SQLException, IOException {
+		int memberPK = memberMapper.selectMemberPkByUserId(userId);
+		
 		ResponseData responseData = new ResponseData();
 		Map<String, Integer> mapData = new HashMap<String, Integer>();
 		
-		ServerVO serverVO = serverMapper.selectServerVolumeUsage(subscribePK);
+		ServerVO serverVO = serverMapper.selectServerVolumeUsage(memberPK);
 		System.out.println(serverVO);
 		if(serverVO != null) {
 			mapData.put("voulumeUsage", serverVO.getVolume_usage());
@@ -59,7 +64,6 @@ public class ServerService {
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
 
 		}
-		
 		
 		return responseData;
 	}

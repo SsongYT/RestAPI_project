@@ -114,11 +114,8 @@ public class SubscribeService {
 				if(paymentMapper.insertPayment(paymentVO) == 1) {
 					// 결제 저장 성공
 					ServerVO serverVO = new ServerVO();
-					serverVO.setSubscribe_no(subscribeVO.getSubscribe_pk());
+					serverVO.setMember_no(memberPk);
 					
-					
-					
-					// 여기를... REST로???
 					// 서버 저장
 					if(serverMapper.insertServer(serverVO) == 1) {
 						//서버 저장 성공

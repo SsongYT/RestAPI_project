@@ -17,7 +17,7 @@ public interface SubscribeMapper {
 	//구독정보 변경(구독종료일)
 	int updateSubscribeEndDT(SubscribeVO subscribeVO) throws SQLException, IOException;
 	// [스케줄러] USE_ST Y변경
-	int schedulerSubscribeUseStY() throws SQLException, IOException;
+	int schedulerUpdateSubscribeUseStY() throws SQLException, IOException;
 	// [스케줄러] USE_ST N변경
-	int schedulerSubscribeUseStN() throws SQLException, IOException;
+	int schedulerUpdateSubscribeUseStN() throws SQLException, IOException;
 }

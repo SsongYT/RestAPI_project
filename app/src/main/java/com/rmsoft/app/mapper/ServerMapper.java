@@ -14,7 +14,10 @@ public interface ServerMapper {
 	int insertServer(ServerVO serverVO) throws SQLException, IOException;
 	
 	// 서버에서 사용량 얻기
-	ServerVO selectServerVolumeUsage(int subscribePK) throws SQLException, IOException;
+	ServerVO selectServerVolumeUsage(int memberNo) throws SQLException, IOException;
+	
+	// 구독에 Y가 없는 유저의 서버 삭제
+	int schedulerDelectServer() throws SQLException, IOException;
 
 
 

@@ -72,7 +72,6 @@ public class SubscribeController {
 			
 		}
 		
-		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
@@ -82,8 +81,6 @@ public class SubscribeController {
 		String userId= (String)session.getAttribute("loginMember");
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
-		
-		
 		
 		if(userId != null) {
 			try {
@@ -104,7 +101,7 @@ public class SubscribeController {
 	}
 	
 	//구독정보 변경시 데이터 얻기
-	@GetMapping(value="subscribe/payment")
+	@PostMapping(value="subscribe/payment")
 	public ResponseEntity<ResponseData> findModifySubscribeData(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
 		//세션에러 방지용
 		//String userId= (String)session.getAttribute("loginMember");

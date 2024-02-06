@@ -11,6 +11,6 @@
 	<select id="selectServerVolumeUsage" resultType="com.rmsoft.app.vo.ServerVO">
 		SELECT *   
 		FROM SERVER 
-		WHERE SUBSCRIBE_NO = #{subscribePK}
+		WHERE MEMBER_NO = #{memberNo}
 	</select>
 </mapper>
