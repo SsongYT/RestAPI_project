@@ -54,19 +54,17 @@
 	        	  dataType: 'json',
 	        	  async : false,
 	        	  success: function(data) {
-	        		  if(data.code == "CI000") {
+	        		  if(data.code == "000") {
 	        			isIdValid = true;
-        			  	printMessages('userId', data.solution, 'succesMsg');
-	        		  } else if(data.code == "CI001") {
-	        			isIdValid = false;
-	        			printMessages('userId', data.solution, 'errorMsg');
-	        		  }
+        			  	printMessages('userId', "사용 가능한 아이디 입니다.", 'succesMsg');
+	        		  } 
 	        	  },
-	        	  error: function(request, status, error) {
-	        		  console.log(status);
+	        	  error: function(error) {
 	        		  console.log(error);
+	        		  if(error.responseJSON.code == "C01") {
+	        			  printMessages('userId', "사용 불가능한 아이디 입니다.", 'errorMsg');
+	        		  }
 	        		  isIdValid = false;
-	        		  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
 	        	  }
 			});
 			
@@ -146,17 +144,14 @@
 	        	  dataType : 'json',
 	        	  async : false,
 	        	  success: function(data) {
-	        		if(data.code == "S000") {
-		        		alert(data.messages + ": " +  data.solution);
+	        		if(data.code == "000") {
+		        		alert("회원가입에 성공하였습니다.");
 		        		location.replace("/login");
-		        	} else if(data.code == "S001") {
-		        		alert(data.messages + ": " +  data.solution);
 		        	}
 	        	  },
-	        	  error: function(request, status, error) {
-	        		  console.log(status);
-        		  	  console.log(error);
-	        		  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	        	  error: function(error) {
+        		  	  console.log(error.responseJSON.code == "001");
+	        		  alert("회원가입에 실패하였습니다.");
 	        	  }
 			});
 			

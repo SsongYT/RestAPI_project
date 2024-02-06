@@ -40,4 +40,10 @@ public class WebController {
 	public String subscribePage() {
 		return "subscribe";
 	}
+	
+	//대시보드 페이지 이동
+	@GetMapping("/dashboard")
+	public String dashboardPage() {
+		return "dashboard";
+	}
 }

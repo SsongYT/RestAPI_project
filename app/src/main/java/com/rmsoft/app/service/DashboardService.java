@@ -11,55 +11,51 @@ import com.rmsoft.app.etc.ResponseData;
 import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.mapper.MemberMapper;
 import com.rmsoft.app.mapper.ServerMapper;
+import com.rmsoft.app.mapper.SolutionMapper;
+import com.rmsoft.app.mapper.SubscribeMapper;
 import com.rmsoft.app.vo.ServerVO;
+import com.rmsoft.app.vo.SolutionVO;
+import com.rmsoft.app.vo.SubscribeVO;
 
 @Service
 public class DashboardService {
 	
-	private final ServerMapper serverMapper;
+	private final SolutionMapper solutionMapper;
+	private final SubscribeMapper subscribeMapper;
 	private final MemberMapper memberMapper;
+	private final ServerMapper serverMapper;
 	
-	public DashboardService(ServerMapper serverMapper, MemberMapper memberMapper) {
-		this.serverMapper = serverMapper;
+	public DashboardService(SolutionMapper solutionMapper, SubscribeMapper subscribeMapper, MemberMapper memberMapper, ServerMapper serverMapper) {
+		this.solutionMapper = solutionMapper;
+		this.subscribeMapper = subscribeMapper;
 		this.memberMapper = memberMapper;
+		this.serverMapper = serverMapper;
 	}
 	
-	// 서버테이블 저장
-	public ResponseData inputServer(ServerVO serverVO) throws SQLException, IOException {
-		ResponseData responseData = new ResponseData();
-		
-		if(serverMapper.insertServer(serverVO) == 1) {
-			//서버 저장 성공
-			responseData.setCode(ResponseDataEnum.basic_true.getCode());
-			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
-
-		} else {
-			// 서버 저장 실패
-			responseData.setCode(ResponseDataEnum.basic_false.getCode());
-			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
-
-		}
-		
-		return responseData;
-	}
-	
-	// 서버테이블 사용량 얻기
-	public ResponseData findVolumeUsage(String userId) throws SQLException, IOException {
+	// 대시보드 정보얻기
+	public ResponseData findDashboardData(String userId) throws SQLException, IOException {
 		int memberPK = memberMapper.selectMemberPkByUserId(userId);
-		
 		ResponseData responseData = new ResponseData();
-		Map<String, Integer> mapData = new HashMap<String, Integer>();
+		Map<String, Object> mapData = new HashMap<String, Object>();
 		
+		// 사용량 얻기
 		ServerVO serverVO = serverMapper.selectServerVolumeUsage(memberPK);
-		System.out.println(serverVO);
-		if(serverVO != null) {
-			mapData.put("voulumeUsage", serverVO.getVolume_usage());
+		// 종료일 얻기
+		SubscribeVO subscribeVO = subscribeMapper.selectSubscribeEndDt(memberPK);
+		// 총용량 얻기
+		SolutionVO solutionVO = solutionMapper.selectSolutionBySolutionPk(subscribeVO.getSolution_no());
+
+		if(serverVO != null && subscribeVO != null && solutionVO != null) {
+			mapData.put("solution", solutionVO.getSolution_type());
+			mapData.put("volumeUsage", serverVO.getVolume_usage());
+			mapData.put("solutionVolume", solutionVO.getSolution_volume());
+			mapData.put("endDt", subscribeVO.getEnd_dt());
+			
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
 
 			responseData.setData(mapData);
 		} else {
-			//실패 로직(검색 안됨)
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
 

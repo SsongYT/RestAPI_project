@@ -79,10 +79,13 @@
 	        		outputSolutionType(data.data);
 		       	} 
 	          },
-	          error: function(request, status, error) {
-	        	  console.log(status);
+	          error: function(error) {
 	        	  console.log(error);
-	        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	        	  if(error.responseJSON.code == "E005") {
+		        	  	alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	      		  } else if(error.responseJSON.code == "001") {
+	      			  alert("다시 시도해주세요.");
+	      		  } 
 	          }
 		});
 	}
@@ -102,10 +105,13 @@
         		outputSolutionInfo(data.data);
 	       	} 
           },
-          error: function(request, status, error) {
-        	  console.log(status);
+          error: function(error) {
         	  console.log(error);
-        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+        	  if(error.responseJSON.code == "E005") {
+	        	  	alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+      		  } else if(error.responseJSON.code == "001") {
+      			  alert("솔루션 타입을 확인해 주세요.");
+      		  } 
           }
 		});
 	};
@@ -120,8 +126,7 @@
 				solutionType: $('#solution').val(),
 				startDate : startDate,
 				endDate : endDate,
-				solutionPrice : $('#priceInt').val(),
-				diffMonths :$('#diffMonths').val()
+				solutionPrice : $('#priceInt').val()
 		}
 
 		$.ajax({
@@ -134,13 +139,19 @@
 	          success: function(data) {
 	        	console.log(data)
 	        	if(data.code == "000") {
-	        		// 성공했을때 할일
+	        		alert("구독신청이 완료되었습니다.");
+	        		location.replace("/dashboard");
 		       	} 
 	          },
-	          error: function(request, status, error) {
-	        	  console.log(status);
+	          error: function(error) {
 	        	  console.log(error);
-	        	  alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	        	  if(error.responseJSON.code == "E005") {
+	        	  	alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+        		  } else if(error.responseJSON.code == "S01") {
+        			  alert("로그인 정보를 확인해주세요.");
+        		  } else if(error.responseJSON.code == "P01") {
+        			  alert("결제 금액을 확인해주세요.");	  
+        		  }
 	          }
 			});
 	}

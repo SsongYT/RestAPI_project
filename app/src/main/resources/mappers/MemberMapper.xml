@@ -10,7 +10,7 @@
 	</insert>
 	
 	<delete id="deleteMember">
-		DELETE FROM MEMBER WHERE MEMBER_PK = #{deletePK}
+		DELETE FROM MEMBER WHERE MEMBER_PK = (SELECT MEMBER_PK FROM MEMBER WHERE MEMBER_ID = #{memberId})
 	</delete>
 	
 	<select id="selectMemberById" resultType="int">
@@ -18,7 +18,6 @@
 		FROM MEMBER 
 		WHERE USER_ID = #{checkId}
 	</select>
-	
 	
 	<select id="selectLoginById" resultType="int">
 		SELECT COUNT(*) 

@@ -13,7 +13,7 @@ public interface MemberMapper {
 	// 회원가입
 	int insertMember(MemberDTO memberDTO) throws SQLException, IOException;
 	// 회원탈퇴
-	int deleteMember(int deletePK) throws SQLException, IOException;
+	int deleteMember(String memberId) throws SQLException, IOException;
 	//ID 중복체크
 	int selectMemberById(String checkId) throws SQLException, IOException;
 	//아이디 존재유무확인

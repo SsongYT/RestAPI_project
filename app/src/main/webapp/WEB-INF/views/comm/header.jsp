@@ -28,7 +28,12 @@
 			<div class="collapse navbar-collapse" id="mynavbar">
 
 				<ul class="navbar-nav me-auto">
-					<li class="nav-item"><a class="nav-link" href="/subscribe">구독하기</a></li>
+					<c:choose>
+						<c:when test="${sessionScope.loginMember != null}">
+							<li class="nav-item"><a class="nav-link" href="/subscribe">구독하기</a></li>
+							<li class="nav-item"><a class="nav-link" href="/dashboard">대시보드</a></li>
+						</c:when>
+					</c:choose>
 				</ul>
 				
 				<div class="d-flex">

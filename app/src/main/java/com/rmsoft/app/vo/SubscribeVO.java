@@ -16,6 +16,7 @@ public class SubscribeVO {
 	private LocalDateTime start_dt;
 	private LocalDateTime end_dt;
 	private char use_st;
+	private char modified_st;
 	private LocalDateTime create_dt;
 	private LocalDateTime modified_dt;
 }

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rmsoft.app.dto.SubscribeDTO;
 import com.rmsoft.app.dto.SubscribeModifyDTO;
+import com.rmsoft.app.etc.ExceptionEnum;
 import com.rmsoft.app.etc.ResponseData;
+import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.service.SubscribeService;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,11 +42,14 @@ public class SubscribeController {
 			if(responseData.getCode().equals("000")) {
 				httpStatus = HttpStatus.OK;
 			} else {
-				//에러코드
+				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 			
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
+			responseData = new ResponseData();
+			httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+			responseData.setCode(ExceptionEnum.SQLException.getCode());
+			responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 			
 		}
 		
@@ -64,18 +69,21 @@ public class SubscribeController {
 			if(responseData.getCode().equals("000")) {
 				httpStatus = HttpStatus.OK;
 			} else {
-				//에러코드
+				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 			
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
+			responseData = new ResponseData();
+			httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+			responseData.setCode(ExceptionEnum.SQLException.getCode());
+			responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 			
 		}
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
-	//구독정보 저장
+	//구독 신청
 	@PostMapping(value = "subscribe")
 	public ResponseEntity<ResponseData> inputSubscribe(@RequestBody SubscribeDTO subscribeDTO, HttpSession session) {
 		String userId= (String)session.getAttribute("loginMember");
@@ -85,16 +93,25 @@ public class SubscribeController {
 		if(userId != null) {
 			try {
 				responseData = subscribeService.inputSubscribe(subscribeDTO, userId);
-				httpStatus = HttpStatus.OK;
+				if(responseData.getCode().equals("000")) {					
+					httpStatus = HttpStatus.OK;
+				} else {
+					httpStatus = HttpStatus.BAD_REQUEST;
+				}
 				
 			} catch (SQLException | IOException e) {
-				
-				e.printStackTrace();
-				
+				responseData = new ResponseData();
+				httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+				responseData.setCode(ExceptionEnum.SQLException.getCode());
+				responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 			}
 			
 		} else {
 			// 세션 에러
+			responseData = new ResponseData();
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseData.setCode(ResponseDataEnum.session_fasle.getCode());
+			responseData.setMessages(ResponseDataEnum.session_fasle.getMessages());
 		}
 
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
@@ -103,10 +120,7 @@ public class SubscribeController {
 	//구독정보 변경시 데이터 얻기
 	@PostMapping(value="subscribe/payment")
 	public ResponseEntity<ResponseData> findModifySubscribeData(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
-		//세션에러 방지용
-		//String userId= (String)session.getAttribute("loginMember");
-		String userId = "test5";
-		
+		String userId= (String)session.getAttribute("loginMember");
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
 		
@@ -114,15 +128,25 @@ public class SubscribeController {
 			try {
 				
 				responseData = subscribeService.findModifySubscribeData(SubscribeModifyDTO, userId);
-				httpStatus = HttpStatus.OK;
+				if(responseData.getCode().equals("000")) {					
+					httpStatus = HttpStatus.OK;
+				} else {
+					httpStatus = HttpStatus.BAD_REQUEST;
+				}
 				
 			} catch (SQLException | IOException e) {
-
-				e.printStackTrace();
+				responseData = new ResponseData();
+				httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+				responseData.setCode(ExceptionEnum.SQLException.getCode());
+				responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 			}
 			
 		} else {
 			// 세션 에러
+			responseData = new ResponseData();
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseData.setCode(ResponseDataEnum.session_fasle.getCode());
+			responseData.setMessages(ResponseDataEnum.session_fasle.getMessages());
 		}
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
@@ -131,10 +155,7 @@ public class SubscribeController {
 	//구독정보 변경
 	@PatchMapping(value="subscribe")
 	public ResponseEntity<ResponseData> modifySubscribe(@RequestBody SubscribeModifyDTO SubscribeModifyDTO, HttpSession session) {
-		//세션에러 방지용
-		//String userId= (String)session.getAttribute("loginMember");
-		String userId = "test5";
-		
+		String userId= (String)session.getAttribute("loginMember");
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
 		
@@ -142,15 +163,25 @@ public class SubscribeController {
 			try {
 				
 				responseData = subscribeService.modifySubscribe(SubscribeModifyDTO, userId);
-				httpStatus = HttpStatus.OK;
+				if(responseData.getCode().equals("000")) {					
+					httpStatus = HttpStatus.OK;
+				} else {
+					httpStatus = HttpStatus.BAD_REQUEST;
+				}
 				
 			} catch (SQLException | IOException e) {
-				
-				e.printStackTrace();
+				responseData = new ResponseData();
+				httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+				responseData.setCode(ExceptionEnum.SQLException.getCode());
+				responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 			}
 			
 		} else {
 			// 세션 에러
+			responseData = new ResponseData();
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseData.setCode(ResponseDataEnum.session_fasle.getCode());
+			responseData.setMessages(ResponseDataEnum.session_fasle.getMessages());
 		}
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);

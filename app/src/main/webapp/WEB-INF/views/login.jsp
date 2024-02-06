@@ -41,19 +41,17 @@
 	       	  dataType: 'json',
 	       	  async : false,
 	       	  success: function(data) {
-	       		  if(data.code == "L000") {
-	       			alert(data.messages + ": " +  data.solution);
+	       		  if(data.code == "000") {
+	       			alert("로그인에 성공하였습니다.");
 	       			location.replace("/");
-	       		  } else if(data.code == "L001") {
-	       			alert(data.messages + ": " +  data.solution);
-	       		  } else if(data.code == "L002") {
-	       			alert(data.messages + ": " +  data.solution);
 	       		  }
 	       	  },
-	       	  error: function(request, status, error) {
-	       		console.log(status);
-	       		console.log(error);
-	       		alert("DB에 문제가 있습니다. 다시 시도해 주세요.");
+	       	  error: function(error) {
+	       		if(error.responseJSON.code == "L01") {
+	       			alert("아이디를 확인하여주세요.");
+	       		} else if(error.responseJSON.code == "L02") {
+	       			alert("비밀번호를 확인하여주세요." );
+	       		}
 	       	  }
 		});
 

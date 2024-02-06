@@ -15,15 +15,22 @@
 		SELECT * 
 		FROM SUBSCRIBE 
 		WHERE MEMBER_NO = #{memberPk} 
-			AND USE_ST = 'Y'
+			AND MODIFIED_ST = 'Y'
 	</select>
 	
 	<update id="updateSubscribeEndDT">
 		UPDATE SUBSCRIBE 
-		SET END_DT = #{end_dt}, MODIFIED_DT = now() 
+		SET END_DT = #{end_dt}, MODIFIED_ST= #{modified_st}, MODIFIED_DT = now()  
 		WHERE MEMBER_NO = #{member_no} 
-			AND USE_ST = 'Y'
+			AND MODIFIED_ST = 'Y'
 	</update>
+	
+	<select id="selectSubscribeEndDt" resultType="com.rmsoft.app.vo.SubscribeVO">
+		SELECT * 
+		FROM SUBSCRIBE 
+		WHERE MEMBER_NO = #{memberPk} 
+			AND USE_ST = 'Y'
+	</select>
 	
 	<update id="schedulerSubscribeUseStY">
 		UPDATE SUBSCRIBE 

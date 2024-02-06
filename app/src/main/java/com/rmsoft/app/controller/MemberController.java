@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rmsoft.app.dto.LoginDTO;
 import com.rmsoft.app.dto.MemberDTO;
+import com.rmsoft.app.etc.ExceptionEnum;
 import com.rmsoft.app.etc.ResponseData;
+import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +30,7 @@ public class MemberController {
 		this.memberService = memberService;
 	}
 	
+	//아이디 중복검사
 	@GetMapping("signup/id/{checkId}")
 	public ResponseEntity<ResponseData> hasCheckId(@PathVariable("checkId") String checkId) {
 		ResponseData responseData = new ResponseData();
@@ -35,17 +38,24 @@ public class MemberController {
 		
 		try {
 			responseData = memberService.hasMemberId(checkId);
-	
-			httpStatus = HttpStatus.OK;
+			
+			if(responseData.getCode().equals("000")){
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 			
 		} catch (SQLException | IOException e) {
-			
-			e.printStackTrace();
+			responseData = new ResponseData();
+			httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+			responseData.setCode(ExceptionEnum.SQLException.getCode());
+			responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 		}
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
+	//회원가입
 	@PostMapping("signup")
 	public ResponseEntity<ResponseData> inputSignupData(@RequestBody MemberDTO memberDTO) {
 		ResponseData responseData = new ResponseData();
@@ -53,33 +63,55 @@ public class MemberController {
 		
 		try {
 			responseData = memberService.inputMember(memberDTO);
-			httpStatus = HttpStatus.OK;
+			if(responseData.getCode().equals("000")){
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 			
 		} catch (SQLException | IOException e) {
-			
-			e.printStackTrace();
+			responseData = new ResponseData();
+			httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+			responseData.setCode(ExceptionEnum.SQLException.getCode());
+			responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 		}
 
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
-	@DeleteMapping("signup/{deletePK}")
-	public ResponseEntity<ResponseData> deleteMember(@PathVariable("deletePK") int deletePK) {
+	//회원 탈퇴
+	@DeleteMapping("signup/{deleteID}")
+	public ResponseEntity<ResponseData> deleteMember(@PathVariable("deleteID") String deleteID, HttpSession session) {
+		String userId= (String)session.getAttribute("loginMember");
 		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
 		
-		try {
-			responseData = memberService.deleteMember(deletePK);
-			httpStatus = HttpStatus.OK;
-			
-		} catch (SQLException | IOException e) {
-			
-			e.printStackTrace();
+		if(userId.equals(deleteID)) {
+			try {
+				responseData = memberService.deleteMember(deleteID);
+				if(responseData.getCode().equals("000")){
+					httpStatus = HttpStatus.OK;
+				} else {
+					httpStatus = HttpStatus.BAD_REQUEST;
+				}
+				
+			} catch (SQLException | IOException e) {
+				responseData = new ResponseData();
+				httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+				responseData.setCode(ExceptionEnum.SQLException.getCode());
+				responseData.setMessages(ExceptionEnum.SQLException.getMessages());
+			}
+		} else {
+			responseData = new ResponseData();
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseData.setCode(ResponseDataEnum.session_fasle.getCode());
+			responseData.setMessages(ResponseDataEnum.session_fasle.getMessages());
 		}
 		
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 	
+	//로그인
 	@PostMapping("login")
 	public ResponseEntity<ResponseData> canLogin(@RequestBody LoginDTO loginDTO, HttpSession session) {
 		ResponseData responseData = null;
@@ -87,16 +119,20 @@ public class MemberController {
 		
 		try {
 			responseData = memberService.canLoginMember(loginDTO);
-			if(responseData.getCode().equals("L000")){
+			if(responseData.getCode().equals("000")){
 				session.setAttribute("loginMember", loginDTO.getUserId());
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
 			}
-			httpStatus = HttpStatus.OK;
 			
 		} catch (SQLException | IOException e) {
-
-			e.printStackTrace();
+			responseData = new ResponseData();
+			httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+			responseData.setCode(ExceptionEnum.SQLException.getCode());
+			responseData.setMessages(ExceptionEnum.SQLException.getMessages());
 		}
-			
+
 		return new ResponseEntity<ResponseData>(responseData, httpStatus);
 	}
 }

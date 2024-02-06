@@ -19,48 +19,30 @@ public class MemberService {
 	public MemberService(MemberMapper memberMapper) {
 		this.memberMapper = memberMapper;
 	}
-	
+	// 아이디 중복검사
 	public ResponseData hasMemberId(String checkId) throws SQLException, IOException {
 		ResponseData responseData = new ResponseData();
 		if(memberMapper.selectMemberById(checkId) == 0) {
-			responseData.setCode(ResponseDataEnum.check_id_true.getCode());
-			responseData.setMessages(ResponseDataEnum.check_id_true.getMessages());
-
-		} else {
-			responseData.setCode(ResponseDataEnum.check_id_false.getCode());
-			responseData.setMessages(ResponseDataEnum.check_id_false.getMessages());
-
-		}
-		
-		return responseData;
-	}
-
-	public ResponseData inputMember(MemberDTO memberDTO) throws SQLException, IOException {
-		ResponseData responseData = new ResponseData();
-		
-		if(memberMapper.insertMember(memberDTO) == 1) {
-			responseData.setCode(ResponseDataEnum.signup_true.getCode());
-			responseData.setMessages(ResponseDataEnum.signup_true.getMessages());
-
-		} else {
-			responseData.setCode(ResponseDataEnum.signup_false.getCode());
-			responseData.setMessages(ResponseDataEnum.signup_false.getMessages());
-
-		}
-		
-		return responseData;
-	}
-	
-	public ResponseData deleteMember(int deletePK) throws SQLException, IOException {
-		ResponseData responseData = new ResponseData();
-		
-		if(memberMapper.deleteMember(deletePK) == 1) {
-			//성공
 			responseData.setCode(ResponseDataEnum.basic_true.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
 
 		} else {
-			//실패
+			responseData.setCode(ResponseDataEnum.check_false_id.getCode());
+			responseData.setMessages(ResponseDataEnum.check_false_id.getMessages());
+
+		}
+		
+		return responseData;
+	}
+	// 회원 가입
+	public ResponseData inputMember(MemberDTO memberDTO) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
+		
+		if(memberMapper.insertMember(memberDTO) == 1) {
+			responseData.setCode(ResponseDataEnum.basic_true.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
+
+		} else {
 			responseData.setCode(ResponseDataEnum.basic_false.getCode());
 			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
 
@@ -68,16 +50,32 @@ public class MemberService {
 		
 		return responseData;
 	}
+	// 회원 탈퇴
+	public ResponseData deleteMember(String deleteID) throws SQLException, IOException {
+		ResponseData responseData = new ResponseData();
+		
+		if(memberMapper.deleteMember(deleteID) == 1) {
+			responseData.setCode(ResponseDataEnum.basic_true.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
 
+		} else {
+			responseData.setCode(ResponseDataEnum.basic_false.getCode());
+			responseData.setMessages(ResponseDataEnum.basic_false.getMessages());
+
+		}
+		
+		return responseData;
+	}
+	
+	// 로그인
 	public ResponseData canLoginMember(LoginDTO loginDTO) throws SQLException, IOException {
 		ResponseData responseData = new ResponseData();
 
 		if(memberMapper.selectLoginById(loginDTO) == 1) {
 			if(memberMapper.selectLoginMember(loginDTO) == 1) {
-				responseData.setCode(ResponseDataEnum.login_true.getCode());
-				responseData.setMessages(ResponseDataEnum.login_true.getMessages());
-	
-				
+				responseData.setCode(ResponseDataEnum.basic_true.getCode());
+				responseData.setMessages(ResponseDataEnum.basic_true.getMessages());
+
 			} else {
 				responseData.setCode(ResponseDataEnum.login_fasle_password.getCode());
 				responseData.setMessages(ResponseDataEnum.login_fasle_password.getMessages());

@@ -16,4 +16,5 @@ public class PaymentVO {
 	private String payment_st;
 	private int payment_price;
 	private LocalDateTime payment_dt;
+	private LocalDateTime create_dt;
 }

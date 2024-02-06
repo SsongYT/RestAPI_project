@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rmsoft.app.etc.ExceptionEnum;
 import com.rmsoft.app.etc.ResponseData;
+import com.rmsoft.app.etc.ResponseDataEnum;
 import com.rmsoft.app.service.DashboardService;
 
 import jakarta.servlet.http.HttpSession;
@@ -17,27 +19,40 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 public class DashboardController {
 	
-	private final DashboardService serverService;
+	private final DashboardService dashboardService;
 	
-	public DashboardController(DashboardService serverService, HttpSession session) {
-		this.serverService = serverService;
+	public DashboardController(DashboardService dashboardService) {
+		this.dashboardService = dashboardService;
 	}
 	
-	@GetMapping("dashboard")
-	public ResponseEntity<ResponseData> getData() {
-		//세션에러 방지용
-		//String userId= (String)session.getAttribute("loginMember");
-		String userId = "test5";
-				
-		ResponseData responseData = new ResponseData();
+	@GetMapping("dashboard/data")
+	public ResponseEntity<ResponseData> findDashboardData(HttpSession session) {
+		String userId= (String)session.getAttribute("loginMember");
+		ResponseData responseData = null;
 		HttpStatus httpStatus = null;
 		
-		try {
-			responseData = serverService.findVolumeUsage(userId);
+		if(userId != null) {
+			try {
+				responseData = dashboardService.findDashboardData(userId);
+				if(responseData.getCode().equals("000")) {					
+					httpStatus = HttpStatus.OK;
+				} else {
+					httpStatus = HttpStatus.BAD_REQUEST;
+				}
+				
+			} catch (SQLException | IOException e) {
+				responseData = new ResponseData();
+				httpStatus = ExceptionEnum.SQLException.getHttpStatus();
+				responseData.setCode(ExceptionEnum.SQLException.getCode());
+				responseData.setMessages(ExceptionEnum.SQLException.getMessages());
+			}
 			
-		} catch (SQLException | IOException e) {
-			
-			e.printStackTrace();
+		} else {
+			// 세션 에러
+			responseData = new ResponseData();
+			httpStatus = HttpStatus.BAD_REQUEST;
+			responseData.setCode(ResponseDataEnum.session_fasle.getCode());
+			responseData.setMessages(ResponseDataEnum.session_fasle.getMessages());
 		}
 	
 		
