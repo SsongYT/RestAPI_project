@@ -13,4 +13,32 @@
 		FROM SERVER 
 		WHERE MEMBER_NO = #{memberNo}
 	</select>
+	
+	<delete id ="schedulerDelectServer">
+		DELETE FROM SERVER 
+		WHERE MEMBER_NO IN 
+			(
+			SELECT B.MEMBER_PK
+			FROM
+				(
+				SELECT COUNT(MEM.MEMBER_PK) AS total, MEM.MEMBER_PK
+				FROM MEMBER MEM 
+					INNER JOIN SUBSCRIBE SUB 
+						ON MEM.MEMBER_PK = SUB.MEMBER_NO 
+				GROUP BY MEM.MEMBER_PK
+				) A
+			INNER JOIN
+				(
+				SELECT COUNT(MEM.MEMBER_PK) AS isN, MEM.MEMBER_PK
+				FROM MEMBER MEM
+					INNER JOIN SUBSCRIBE SUB
+						ON MEM.MEMBER_PK = SUB.MEMBER_NO
+				WHERE SUB.USE_ST = 'N'
+				GROUP BY MEM.MEMBER_PK
+				) B
+			ON A.MEMBER_PK = B.MEMBER_PK
+				AND A.total = B.isN
+			GROUP BY B.MEMBER_PK
+			)
+	</delete>
 </mapper>

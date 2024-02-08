@@ -32,7 +32,7 @@
 			AND USE_ST = 'Y'
 	</select>
 	
-	<update id="schedulerSubscribeUseStY">
+	<update id="schedulerUpdateSubscribeUseStY">
 		UPDATE SUBSCRIBE 
 		SET USE_ST = 'Y'
 		WHERE SUBSCRIBE_PK 
@@ -43,7 +43,7 @@
 						AND USE_ST = "N")AS a);
 	</update>
 	
-	<update id="schedulerSubscribeUseStN">
+	<update id="schedulerUpdateSubscribeUseStN">
 		UPDATE SUBSCRIBE 
 		SET USE_ST = 'N'
 		WHERE SUBSCRIBE_PK 
