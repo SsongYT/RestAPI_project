@@ -52,6 +52,14 @@
 			<version>3.0.3</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!--시큐리티 설정 -->
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
+		
 		<!--추가설정 -->
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
