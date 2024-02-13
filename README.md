@@ -4,12 +4,12 @@
 </div>
 
 <h1>📌ERD & REST API</h1>
-<img width="420" alt="ERD" src="https://github.com/SsongYT/RMSOFT/assets/136442036/67fd4827-ff08-4afe-926f-d0688a4abc7e"/>
-<img width="420" alt="REST API" src="https://github.com/SsongYT/RMSOFT/assets/136442036/59de2592-2105-4e06-a4a3-073107dd9983"/>
+<img width="400" alt="ERD" src="https://github.com/SsongYT/RMSOFT/assets/136442036/67fd4827-ff08-4afe-926f-d0688a4abc7e"/>
+<img width="400" alt="REST API" src="https://github.com/SsongYT/RMSOFT/assets/136442036/59de2592-2105-4e06-a4a3-073107dd9983"/>
 <br/>
 <h1>📌테이블 정의서 & 기능 정의서</h1>
-<img width="420" alt="테이블 정의서" src="https://github.com/SsongYT/RMSOFT/assets/136442036/77a8ac8c-7a2e-42f1-a856-9918baa7ccb0"/>
-<img width="420" alt="기능정의서" src="https://github.com/SsongYT/RMSOFT/assets/136442036/5bf7b02f-ef72-4ea1-a7b4-a6546ac2dfa8"/>
+<img width="400" alt="테이블 정의서" src="https://github.com/SsongYT/RMSOFT/assets/136442036/77a8ac8c-7a2e-42f1-a856-9918baa7ccb0"/>
+<img width="400" alt="기능정의서" src="https://github.com/SsongYT/RMSOFT/assets/136442036/5bf7b02f-ef72-4ea1-a7b4-a6546ac2dfa8"/>
 <br/>
 <h1>📌시스템 구성도</h1>
 <img width="500" alt="시스템 구성도" src="https://github.com/SsongYT/RMSOFT/assets/136442036/a5f18651-bda3-4030-b818-54950f0a6261"/>
