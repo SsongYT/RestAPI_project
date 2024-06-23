@@ -1,4 +1,4 @@
-<div align = center><img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=180&section=header&text=RMSOFT&fontSize=90"/></div>
+<div align = center><img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=180&section=header&text=RestAPI_Project&fontSize=90"/></div>
 <div align = right>
 <h5>📅 2024.01.26 ~ 2024.02.06</h5>
 </div>
